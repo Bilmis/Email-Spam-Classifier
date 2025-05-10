@@ -1,5 +1,6 @@
 import streamlit as st
 import tensorflow as tf
+import numpy as np
 import pickle
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import string
@@ -8,7 +9,7 @@ from nltk.corpus import stopwords
 nltk.download('stopwords')
 
 # Load the trained model and tokenizer
-model = tf.keras.models.load_model('spam_classifier_model.h5')
+model = tf.keras.models.load_model('Spam_classifier_model.keras', compile=False)
 with open('tokenizer.pkl', 'rb') as f:
     tokenizer = pickle.load(f)
 
@@ -38,9 +39,11 @@ if st.button("Predict"):  # Only predict when the button is clicked
     padded = pad_sequences(seq, maxlen=max_len, padding='post', truncating='post')
 
     # Make prediction
+    # Convert logits to probabilities
     prediction = model.predict(padded)[0][0]
-    result = "🟢 Not Spam" if prediction < 0.5 else "🔴 Spam"
-    confidence = round(prediction * 100, 2) if prediction >= 0.5 else round((1 - prediction) * 100, 2)
+    probability = 1 / (1 + np.exp(-prediction))  # Apply sigmoid
+    result = "🟢 Not Spam" if probability < 0.5 else "🔴 Spam"
+    confidence = round(probability * 100, 2) if probability >= 0.5 else round((1 - probability) * 100, 2)
 
     # Display the result
     st.subheader(f"Prediction: {result}")
