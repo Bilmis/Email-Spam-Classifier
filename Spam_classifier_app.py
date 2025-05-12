@@ -9,7 +9,7 @@ from nltk.corpus import stopwords
 nltk.download('stopwords')
 
 # Load the trained model and tokenizer
-model = tf.keras.models.load_model('Spam_classifier_model.h5', compile=False)
+model = tf.keras.models.load_model('Spam_classifier_model.keras')
 with open('tokenizer.pkl', 'rb') as f:
     tokenizer = pickle.load(f)
 
